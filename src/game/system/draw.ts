@@ -32,8 +32,8 @@ export class Draw extends System {
     }
     for (const [trans, sprite] of this.family)
     {
-      sprite.sprite.x = trans.x - transCamera.x
-      sprite.sprite.y = trans.y - transCamera.y
+      sprite.sprite.x = trans.x - transCamera.x + sprite.anchor.x
+      sprite.sprite.y = trans.y - transCamera.y + sprite.anchor.y
     }
   }
 }

@@ -2,9 +2,10 @@ import { System } from '@shrimp/ecs/system'
 import { World } from '@shrimp/ecs/world'
 import { Family } from '@shrimp/ecs/family'
 import { Transform } from '@game/component/transform'
+import { Player as PlayerComponent } from '@game/component/player'
 
 export class Player extends System {
-  private family = new Family([Transform])
+  private family = new Family([Transform, PlayerComponent])
 
   public constructor(world: World) {
     super(world)
@@ -15,9 +16,14 @@ export class Player extends System {
   }
 
   public execute(): void {
-    for (const [_trans] of this.family)
+    for (const [trans, player] of this.family)
     {
-      // trans.x += 1
+      // 更新処理
+      // アニメーション処理
+      const cell = player.cells[player.currentCellIndex]
+      const transCell = cell.getComponent(Transform)
+      trans.x = transCell.x
+      trans.y = transCell.y
     }
   }
 }

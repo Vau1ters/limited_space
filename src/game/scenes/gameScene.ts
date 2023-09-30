@@ -1,26 +1,37 @@
-import { Scene } from '@shrimp/scene'
-import { application } from'@shrimp/application'
 import * as PIXI from 'pixi.js'
+import { Scene } from '@shrimp/scene'
 import { World } from '@shrimp/ecs/world'
 import { Entity } from '@shrimp/ecs/entity'
+
+import { SpriteDef } from '@game/graphics/spriteDef'
+
 import { Camera } from '@game/component/camera'
-import { Camera as CameraSystem } from '@game/system/camera'
-import { Player } from '@game/system/player'
-import { Draw } from '@game/system/draw'
+import { Player } from '@game/component/player'
 import { Sprite } from '@game/component/sprite'
 import { Graphics } from '@game/component/graphics'
 import { Transform } from '@game/component/transform'
-import { MapAttribute, AttrType } from '@game/component/mapAttribute'
+import { CellAttribute, AttrType } from '@game/component/cellAttribute'
+
+import { Camera as CameraSystem } from '@game/system/camera'
+import { Mouse } from '@game/system/mouse'
+import { Player as PlayerSystem } from '@game/system/player'
+import { Draw } from '@game/system/draw'
 
 export class GameScene implements Scene {
   private readonly world: World
   public constructor() {
     this.world = new World()
-    this.world.addSystem(new Player(this.world))
+    this.world.addSystem(new Mouse(this.world))
+    this.world.addSystem(new PlayerSystem(this.world))
     this.world.addSystem(new Draw(this.world))
     this.world.addSystem(new CameraSystem(this.world))
 
-    const { default: url } = require('res/bus.png') // eslint-disable-line  @typescript-eslint/no-var-requires
+    // Sprite設定
+    SpriteDef.defineSpriteDef('bus', 4,
+      new Map([
+        ['left', [{idx: 0, time: 100}, {idx: 1, time: 100}]],
+        ['leftBack', [{idx: 2, time: 100}, {idx: 3, time: 100}]]
+      ]))
 
 
     // マップセル
@@ -40,7 +51,7 @@ export class GameScene implements Scene {
     for (let i = 0; i < cell_num; i++) {
       cells.push(new Entity())
       cells[i].addComponent(new Transform(pos[i][0], pos[i][1]))
-      cells[i].addComponent(new MapAttribute(attributes[i]))
+      cells[i].addComponent(new CellAttribute(attributes[i]))
       const gr = new PIXI.Graphics()
 
       switch(attributes[i]) {
@@ -63,19 +74,21 @@ export class GameScene implements Scene {
           gr.endFill()
           break
       }
-      application.stage.addChild(gr)
-      cells[i].addComponent(new Graphics(gr))
+      cells[i].addComponent(new Graphics(gr, 'bg'))
       this.world.addEntity(cells[i])
     }
 
     // バス
-    const sprite = PIXI.Sprite.from(url)
-
-    application.stage.addChild(sprite)
     const bus = new Entity()
+    const defBus = SpriteDef.getDef('bus')
+    bus.addComponent(new Player(0, cells))
     bus.addComponent(new Transform(0, 0))
-    bus.addComponent(new Sprite(sprite))
+    bus.addComponent(new Sprite(defBus, 'left', 'chr', {x: -16, y: -16}))
     this.world.addEntity(bus)
+    const busBack = new Entity()
+    busBack.addComponent(bus.getComponent(Transform))
+    busBack.addComponent(new Sprite(defBus, 'leftBack', 'chrBack', {x: -16, y: -16}))
+    this.world.addEntity(busBack)
 
     // カメラ
     const camera = new Entity()
