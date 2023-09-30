@@ -48,10 +48,10 @@ export class Sprite implements Component
     if (animName == this.currentAnim) {
       return
     }
-    const currentFrame = this.sprite.currentFrame
+    const currentFrame = this._sprite.currentFrame
     const anim = this.sprites.get(animName)
     assert(anim, `sprite has no ${animName} animation`)
-    this.sprite.textures = anim
+    this._sprite.textures = anim
     this.currentAnim = animName
     if (continuePlay) {
       this._sprite.gotoAndPlay(currentFrame)

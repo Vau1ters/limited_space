@@ -9,6 +9,7 @@ import { SpriteDef } from '@shrimp/graphics/spriteDef'
 import { Camera } from '@game/component/camera'
 import { Player } from '@game/component/player'
 import { Sprite } from '@shrimp/component/sprite'
+import { Show } from '@game/component/show'
 import { Graphics } from '@game/component/graphics'
 import { UI } from '@game/component/ui'
 import { Transform } from '@shrimp/component/transform'
@@ -86,6 +87,7 @@ export class GameScene implements Scene {
       }
 
       cells[i].addComponent(new Graphics(gr, 'bg'))
+      cells[i].addComponent(new Show())
       this.world.addEntity(cells[i])
     }
 
@@ -110,27 +112,10 @@ export class GameScene implements Scene {
           pattern = 'middle'
         }
         road.addComponent(new Sprite(defRoad, pattern, 'bg', {x: -16, y: -16}))
+        road.addComponent(new Show())
         this.world.addEntity(road)
       }
     }
-
-    // バス
-    const bus = new Entity()
-    const defBus = SpriteDef.getDef('bus')
-    bus.addComponent(new Player(0, cells))
-    bus.addComponent(new Transform(0, 0))
-    bus.addComponent(new Sprite(defBus, 'left', 'chr', {x: -16, y: -16}))
-    this.world.addEntity(bus)
-    const busBack = new Entity()
-    busBack.addComponent(bus.getComponent(Transform))
-    busBack.addComponent(new Sprite(defBus, 'leftBack', 'chrBack', {x: -16, y: -16}))
-    this.world.addEntity(busBack)
-
-    // カメラ
-    const camera = new Entity()
-    camera.addComponent(new Transform(0, 0))
-    camera.addComponent(new Camera(bus, -128, 0))
-    this.world.addEntity(camera)
 
     // テキストウィンドウ
     const textWindow = new Entity()
@@ -141,8 +126,30 @@ export class GameScene implements Scene {
       fill: ['#FFFFFF'],
     });
 
-    textWindow.addComponent(new UI(16, 140, 288, 80, 'ゾンビが襲ってくる。\n我々は逃げるのに必死だった。', style))
+    textWindow.addComponent(new UI(16, 140, 288, 80, '街は突如としてゾンビウイルスに侵された。\nバスを運転していた私は\nこのまま街から逃げざるを得なかった。', style, false, 5))
+    textWindow.addComponent(new Show())
     this.world.addEntity(textWindow)
+
+    // バス
+    const bus = new Entity()
+    const defBus = SpriteDef.getDef('bus')
+    bus.addComponent(new Player(0, cells, textWindow))
+    bus.addComponent(new Transform(0, 0))
+    bus.addComponent(new Sprite(defBus, 'left', 'chr', {x: -16, y: -16}))
+    const show = new Show()
+    bus.addComponent(show)
+    this.world.addEntity(bus)
+    const busBack = new Entity()
+    busBack.addComponent(bus.getComponent(Transform))
+    busBack.addComponent(new Sprite(defBus, 'leftBack', 'chrBack', {x: -16, y: -16}))
+    busBack.addComponent(show)
+    this.world.addEntity(busBack)
+
+    // カメラ
+    const camera = new Entity()
+    camera.addComponent(new Transform(0, 0))
+    camera.addComponent(new Camera(bus, -128, 0))
+    this.world.addEntity(camera)
   }
 
   public exec() {

@@ -6,10 +6,14 @@ import * as PIXI from 'pixi.js'
 export class Graphics implements Component
 {
   public constructor(
-    public graphics: PIXI.Graphics,
+    private _graphics: PIXI.Graphics,
     layer: Layer
   ) {
-    graphics.zIndex = Sprite.layerToZIndex(layer)
-    application.stage.addChild(this.graphics)
+    _graphics.zIndex = Sprite.layerToZIndex(layer)
+    application.stage.addChild(this._graphics)
+  }
+
+  public get graphics(): PIXI.Graphics {
+    return this._graphics
   }
 }

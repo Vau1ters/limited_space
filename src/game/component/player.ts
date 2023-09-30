@@ -11,7 +11,8 @@ export class Player implements Component
   public phase: Phase = 'start'
   public constructor(
     public currentCellIndex: number,
-    public cells: Entity[]
+    public cells: Entity[],
+    public textWindow: Entity
   ) {
     this.prevCellIndex = this.currentCellIndex
     this.ratioMove = 0

@@ -84,6 +84,10 @@ export class Family<I extends Component[], E extends Component[]> implements Ite
     return this.entityIterator.next().value
   }
 
+  public hasNoMember(): boolean {
+    return this.entities.size == 0
+  }
+
   private onEntityAdded(entity: Entity): void {
     entity.componentChangedEvent.addObserver((entity): void => {
       this.onEntityChanged(entity)
