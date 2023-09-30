@@ -23,8 +23,8 @@ export class GameScene implements Scene {
     this.world = new World()
     this.world.addSystem(new Mouse(this.world))
     this.world.addSystem(new PlayerSystem(this.world))
-    this.world.addSystem(new Draw(this.world))
     this.world.addSystem(new CameraSystem(this.world))
+    this.world.addSystem(new Draw(this.world))
 
     // Sprite設定
     SpriteDef.defineSpriteDef('bus', 4,
