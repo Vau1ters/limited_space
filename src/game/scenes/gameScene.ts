@@ -33,24 +33,32 @@ export class GameScene implements Scene {
         ['leftBack', [{idx: 2, time: 100}, {idx: 3, time: 100}]]
       ]))
 
+    SpriteDef.defineSpriteDef('ground', 3,
+      new Map([
+        ['left', [0]],
+        ['middle', [1]],
+        ['right', [2]],
+      ]))
+
 
     // マップセル
+    const cellRadius = 16
     const cells: Entity[] = []
     const cell_num = 4
     const attributes: AttrType[] = 
       ['start', 'normal', 'zombie', 'goal']
 
-    const pos: [number, number][] =
+    const posCells: number[] =
       [
-        [0, 0],
-        [0, 30],
-        [0, 60],
-        [0, 90],
+        0,
+        32 * 4,
+        32 * 8,
+        32 * 12,
       ]
 
     for (let i = 0; i < cell_num; i++) {
       cells.push(new Entity())
-      cells[i].addComponent(new Transform(pos[i][0], pos[i][1]))
+      cells[i].addComponent(new Transform(-posCells[i], 0))
       cells[i].addComponent(new CellAttribute(attributes[i]))
       const gr = new PIXI.Graphics()
 
@@ -58,25 +66,54 @@ export class GameScene implements Scene {
         case 'start':
         case 'goal':
           gr.lineStyle(2, 0xFFFFFF, 1)
-          gr.drawCircle(0, 0, 20)
+          gr.drawCircle(0, 0, cellRadius)
           gr.beginFill(0xFFFFFF)
-          gr.drawCircle(0, 0, 10)
+          gr.drawCircle(0, 0, cellRadius - 4)
           gr.endFill()
           break
         case 'normal':
           gr.beginFill(0xFFFFFF)
-          gr.drawCircle(0, 0, 20)
+          gr.drawCircle(0, 0, cellRadius)
           gr.endFill()
           break
         case 'zombie':
           gr.beginFill(0xFF0000)
-          gr.drawCircle(0, 0, 20)
+          gr.drawCircle(0, 0, cellRadius)
           gr.endFill()
           break
       }
       cells[i].addComponent(new Graphics(gr, 'bg'))
       this.world.addEntity(cells[i])
     }
+
+    // 道
+    const lengths: number[] = []
+    for (let i = 0; i < posCells.length - 1; i++) {
+      lengths[i] = posCells[i + 1] - posCells[i] - cellRadius * 2
+    }
+
+    for (let cellIndex = 0; cellIndex < cells.length; cellIndex++ ) {
+      const count = Math.floor(lengths[cellIndex] / 32)
+      for (let roadIndex = 0; roadIndex < count; roadIndex++) {
+        const road = new Entity()
+        road.addComponent(new Transform(-posCells[cellIndex] - roadIndex * 32 - cellRadius - 16, 0))
+        const defRoad = SpriteDef.getDef('ground')
+        let pattern: string
+        if (roadIndex == 0) {
+          pattern = 'right'
+        } else if (roadIndex == count - 1) {
+          pattern = 'left'
+        } else {
+          pattern = 'middle'
+        }
+        road.addComponent(new Sprite(defRoad, pattern, 'bg', {x: -16, y: -16}))
+        this.world.addEntity(road)
+      }
+    }
+
+
+    
+    
 
     // バス
     const bus = new Entity()
