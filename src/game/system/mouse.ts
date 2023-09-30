@@ -39,9 +39,6 @@ export class Mouse extends System {
     // クリック判定
     Mouse.leftClick = !Mouse.leftHold && Mouse.leftHoldPrev
 
-
-    console.log(Mouse.x, Mouse.y, Mouse.leftClick, Mouse.leftHold)
-
     Mouse.leftHoldPrev = Mouse.leftHold
   }
 }

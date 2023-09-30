@@ -3,7 +3,7 @@ import { Component } from '@shrimp/ecs/component'
 import { assert } from '@shrimp/utils/assertion'
 import * as PIXI from 'pixi.js'
 
-export type Layer = 'bg' | 'chrBack' | 'chr' | 'ui'
+export type Layer = 'bg' | 'chrBack' | 'chr' | 'ui' | 'text'
 
 export class Sprite implements Component
 {
@@ -35,6 +35,8 @@ export class Sprite implements Component
         return 2
       case 'ui':
         return 3
+      case 'text':
+        return 4
     }
   }
 

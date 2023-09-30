@@ -2,13 +2,15 @@ import { System } from '@shrimp/ecs/system'
 import { World } from '@shrimp/ecs/world'
 import { Family } from '@shrimp/ecs/family'
 import { Camera } from '@game/component/camera'
+import { UI } from '@game/component/ui'
 import { Graphics } from '@game/component/graphics'
-import { Sprite } from '@game/component/sprite'
-import { Transform } from '@game/component/transform'
+import { Sprite } from '@shrimp/component/sprite'
+import { Transform } from '@shrimp/component/transform'
 
 export class Draw extends System {
-  private family = new Family([Transform, Sprite])
-  private familyBg = new Family([Transform, Graphics])
+  private family = new Family([Transform, Sprite], [UI])
+  private familyBg = new Family([Transform, Graphics], [UI])
+  private familyUi = new Family([UI])
   private familyCamera = new Family([Transform, Camera])
 
   public constructor(world: World) {
@@ -16,6 +18,7 @@ export class Draw extends System {
     this.family.init(this.world)
     this.familyBg.init(this.world)
     this.familyCamera.init(this.world)
+    this.familyUi.init(this.world)
   }
 
   public init(): void {
@@ -24,6 +27,10 @@ export class Draw extends System {
   public execute(): void {
     const camera = this.familyCamera.getSingleton()
     const transCamera = camera.getComponent(Transform)
+
+    for (const [ui] of this.familyUi) {
+      ui.updateText()
+    }
 
     for (const [trans, graphics] of this.familyBg)
     {

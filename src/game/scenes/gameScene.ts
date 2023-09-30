@@ -1,15 +1,17 @@
 import * as PIXI from 'pixi.js'
+import { TextStyle } from 'pixi.js'
 import { Scene } from '@shrimp/scene'
 import { World } from '@shrimp/ecs/world'
 import { Entity } from '@shrimp/ecs/entity'
 
-import { SpriteDef } from '@game/graphics/spriteDef'
+import { SpriteDef } from '@shrimp/graphics/spriteDef'
 
 import { Camera } from '@game/component/camera'
 import { Player } from '@game/component/player'
-import { Sprite } from '@game/component/sprite'
+import { Sprite } from '@shrimp/component/sprite'
 import { Graphics } from '@game/component/graphics'
-import { Transform } from '@game/component/transform'
+import { UI } from '@game/component/ui'
+import { Transform } from '@shrimp/component/transform'
 import { CellAttribute, AttrType } from '@game/component/cellAttribute'
 
 import { Camera as CameraSystem } from '@game/system/camera'
@@ -68,7 +70,7 @@ export class GameScene implements Scene {
           gr.lineStyle(2, 0xFFFFFF, 1)
           gr.drawCircle(0, 0, cellRadius)
           gr.beginFill(0xFFFFFF)
-          gr.drawCircle(0, 0, cellRadius - 4)
+          gr.drawCircle(0, 0, cellRadius - 6)
           gr.endFill()
           break
         case 'normal':
@@ -82,6 +84,7 @@ export class GameScene implements Scene {
           gr.endFill()
           break
       }
+
       cells[i].addComponent(new Graphics(gr, 'bg'))
       this.world.addEntity(cells[i])
     }
@@ -92,7 +95,7 @@ export class GameScene implements Scene {
       lengths[i] = posCells[i + 1] - posCells[i] - cellRadius * 2
     }
 
-    for (let cellIndex = 0; cellIndex < cells.length; cellIndex++ ) {
+    for (let cellIndex = 0; cellIndex < cells.length; cellIndex++) {
       const count = Math.floor(lengths[cellIndex] / 32)
       for (let roadIndex = 0; roadIndex < count; roadIndex++) {
         const road = new Entity()
@@ -111,10 +114,6 @@ export class GameScene implements Scene {
       }
     }
 
-
-    
-    
-
     // バス
     const bus = new Entity()
     const defBus = SpriteDef.getDef('bus')
@@ -130,8 +129,20 @@ export class GameScene implements Scene {
     // カメラ
     const camera = new Entity()
     camera.addComponent(new Transform(0, 0))
-    camera.addComponent(new Camera(bus))
+    camera.addComponent(new Camera(bus, -128, 0))
     this.world.addEntity(camera)
+
+    // テキストウィンドウ
+    const textWindow = new Entity()
+
+    const style = new TextStyle({
+      fontFamily: 'Arial',
+      fontSize: 12,
+      fill: ['#FFFFFF'],
+    });
+
+    textWindow.addComponent(new UI(16, 140, 288, 80, 'ゾンビが襲ってくる。\n我々は逃げるのに必死だった。', style))
+    this.world.addEntity(textWindow)
   }
 
   public exec() {
